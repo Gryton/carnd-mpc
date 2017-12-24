@@ -23,18 +23,18 @@ on current x postion, current velocity and cosinus of vehicle angle):
 
 ![Alt Text](https://latex.codecogs.com/svg.latex?x_%7Bt+1%7D%20%3D%20x_t%20+%20v_t%20*%20cos%28%5Cpsi%29*dt)
 
-![Alt Text](https://latex.codecogs.com/gif.download?y_%7Bt+1%7D%20%3D%20y_t%20+%20v_t%20*%20sin%28%5Cpsi%29*dt)
+![Alt Text](https://latex.codecogs.com/svg.latex?y_%7Bt+1%7D%20%3D%20y_t%20+%20v_t%20*%20sin%28%5Cpsi%29*dt)
 
-![Alt Text](https://latex.codecogs.com/gif.download?%5Cpsi_%7Bt+1%7D%20%3D%20%5Cpsi_t%20+%20%5Cfrac%7Bv_t%7D%7BL_f%7D%20*%5Cdelta*dt)
+![Alt Text](https://latex.codecogs.com/svg.latex?%5Cpsi_%7Bt+1%7D%20%3D%20%5Cpsi_t%20+%20%5Cfrac%7Bv_t%7D%7BL_f%7D%20*%5Cdelta*dt)
 
-![Alt Text](https://latex.codecogs.com/gif.download?v_%7Bt+1%7D%20%3D%20v_t%20+%20a_t%20*dt)
+![Alt Text](https://latex.codecogs.com/svg.latex?v_%7Bt+1%7D%20%3D%20v_t%20+%20a_t%20*dt)
 
 Errors are also calculated based on previous errors, but also take vehicle
 model into account (so we also predict error).
 
-![Alt Text](https://latex.codecogs.com/gif.download?cte_%7Bt+1%7D%20%3D%20f%28x%29_t%20-%20y_t%20+%20v_t%20*%20sin%28e%5Cpsi%29%20*%20dt)
+![Alt Text](https://latex.codecogs.com/svg.latex?cte_%7Bt+1%7D%20%3D%20f%28x%29_t%20-%20y_t%20+%20v_t%20*%20sin%28e%5Cpsi%29%20*%20dt)
 
-![Alt Text](https://latex.codecogs.com/gif.download?e%5Cpsi_%7Bt+1%7D%20%3D%20%5Cpsi_t%20-%20%5Cpsi%20des_t%20+%20%5Cfrac%7Bv_t%7D%7BL_f%7D%20*%20%5Cdelta%20t%20*%20dt)
+![Alt Text](https://latex.codecogs.com/svg.latex?e%5Cpsi_%7Bt+1%7D%20%3D%20%5Cpsi_t%20-%20%5Cpsi%20des_t%20+%20%5Cfrac%7Bv_t%7D%7BL_f%7D%20*%20%5Cdelta%20t%20*%20dt)
 
 I've put weights on minimizing cte and epsi in state, and steering value in actuators.
 One can have a feeling, that minizing errors is the most critical for MPC,
