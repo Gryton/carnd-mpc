@@ -1,7 +1,104 @@
 # CarND-Controls-MPC
-Self-Driving Car Engineer Nanodegree Program
+#### Self-Driving Car Engineer Nanodegree Program
+This repository contains realisation of Model-Predictive-Controller for
+autonomous drive of Udacity open-source simulator. Target of this project
+was to implement MPC that can safely go through the lake track (and also
+to challenge it to make it fast).
 
----
+
+## Rubric discussion
+
+* Student describes their model in detail. This includes the state, actuators and update equations.
+
+This project uses kinematic model. This means, that state is represented by
+vehicle parameters such as position (x, y), heading (angle), velocity,
+and location parameters, such as cross track error and angle error, computed
+against "desired" driving line. It's different from dynamic model, as
+it doesn't take into account parameters like vehicle mass, road slippery, traction and
+treadwear, etc.
+Actuator that are used by this model are throttle and steering value.
+Kinematic model takes into account time delta to compute state in next timestamp
+t+1 taking all parameters that depend on each other (like position x depends
+on current x postion, current velocity and cosinus of vehicle angle):
+
+![Alt Text](https://latex.codecogs.com/gif.download?x_%7Bt+1%7D%20%3D%20x_t%20+%20v_t%20*%20cos%28%5Cpsi%29*dt)
+
+![Alt Text](https://latex.codecogs.com/gif.download?y_%7Bt+1%7D%20%3D%20y_t%20+%20v_t%20*%20sin%28%5Cpsi%29*dt)
+
+![Alt Text](https://latex.codecogs.com/gif.download?%5Cpsi_%7Bt+1%7D%20%3D%20%5Cpsi_t%20+%20%5Cfrac%7Bv_t%7D%7BL_f%7D%20*%5Cdelta*dt)
+
+![Alt Text](https://latex.codecogs.com/gif.download?v_%7Bt+1%7D%20%3D%20v_t%20+%20a_t%20*dt)
+
+Errors are also calculated based on previous errors, but also take vehicle
+model into account (so we also predict error).
+
+![Alt Text](https://latex.codecogs.com/gif.download?cte_%7Bt+1%7D%20%3D%20f%28x%29_t%20-%20y_t%20+%20v_t%20*%20sin%28e%5Cpsi%29%20*%20dt)
+
+![Alt Text](https://latex.codecogs.com/gif.download?e%5Cpsi_%7Bt+1%7D%20%3D%20%5Cpsi_t%20-%20%5Cpsi%20des_t%20+%20%5Cfrac%7Bv_t%7D%7BL_f%7D%20*%20%5Cdelta%20t%20*%20dt)
+
+I've put weights on minimizing cte and epsi in state, and steering value in actuators.
+One can have a feeling, that minizing errors is the most critical for MPC,
+but it seems that minimizing actuators is most crucial. Even though the
+optimizer can minimize errors really well it wouldn't make it, when it'd
+catch harsh oscillations, as it couldn't compute and react to big oscillations
+quickly enough to not "overdrive". As minimizing throttle isn't really that
+necessary to drive the loop (it just looks not so good when car speeds up
+and down), I've put the heaviest weight on steering value, as it enables
+to drive smoothly and get rid of oscillations. It also gives a really interesting
+feature, as car tries to minimize steering values, so when it predicts a turn, it actually
+starts turning before hitting the turn - what gives something that's similar
+to racing line.
+
+
+* Student discusses the reasoning behind the chosen N (timestep length) and dt (elapsed duration between timesteps) values. Additionally the student details the previous values tried.
+
+I've made only few experiments, as I couldn't see any better results by changing
+timestep length and duration between frames.
+I've tried lowering dt to 0.05, but it made MPC really unstable, as probably
+difference was too small what led to bigger errors, and maybe to actuation before real situation.
+I also haven't noticed better results with longer dt, so I left 0.1 as suggested by Udacity.
+I tried longer timestamp, but when I saw that it causes longer predicted green line,
+that was highly inaccurate in the longer timestamp(I tried N = 25 and 15). I've found that lowering it
+will be better solution, as solver will have to make less computations. Especially as
+I saw that first few points are getting close to desired line, so I ended up
+with N = 8. It makes sense, as David said in lecture, there's no point to try to predict whole track,
+as after .5 second situation is different, because our model is inaccurate,
+and we rather need to react fast, then to predict everything on start.
+
+* Polynomial Fitting and MPC Preprocessing
+
+I've tried second order and third order polynomial. Finally I've chosen third order,
+as it was faster converging with desired line, even though it sometimes
+has very funny ending, that's very curved and that would create very high
+error if trying to drive always the whole predicted path. I'm showing this on image below,
+where it's visible that if we drive all points from green line we will get off the bridge,
+and that cte starts growing at last points. But that's really good drive prediction,
+as it actually converges desired line in 4th timestamp.
+
+![Prediction with 3rd order polynomial](images/prediction.png)
+
+To ease computations I moved waypoints to vehicle space. To do so I computed
+difference between waypoint position and vehicle position, and then
+rotated calculated x and y values, to be aligned to vehicle x axis.
+
+* Model Predictive Control with Latency
+
+To handle latency I decided to compute my state as I would by in the future
+after given latency (I used 100 ms as required by Udacity). So I computed
+vehicle position, steering value and forecast errors after 100 ms by using
+current model values (same principle as in update equations), and I pushed
+it to optimizer as initial state, so it calculates optimal driving parameters
+not for current situation, but for situation in 100ms. One thing I haven't
+computed as in future was vehicle speed, as I don't know it dependency on
+throttle (I haven't tested it to make estimated model), so vehicle speed
+in 100ms future is treated as it would be the same as is now.
+
+I've run safely my model with 55 mph, but I also noticed, that it depends
+a little on my current PC load (I use notebook for this), so probably the code
+could have few optimizations to speed up computing and have more spare
+time for optimizer to compute equations solution.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## Dependencies
 
