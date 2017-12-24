@@ -21,7 +21,7 @@ Kinematic model takes into account time delta to compute state in next timestamp
 t+1 taking all parameters that depend on each other (like position x depends
 on current x postion, current velocity and cosinus of vehicle angle):
 
-![Alt Text](https://latex.codecogs.com/gif.download?x_%7Bt+1%7D%20%3D%20x_t%20+%20v_t%20*%20cos%28%5Cpsi%29*dt)
+![Alt Text](https://latex.codecogs.com/svg.latex?x_%7Bt+1%7D%20%3D%20x_t%20+%20v_t%20*%20cos%28%5Cpsi%29*dt)
 
 ![Alt Text](https://latex.codecogs.com/gif.download?y_%7Bt+1%7D%20%3D%20y_t%20+%20v_t%20*%20sin%28%5Cpsi%29*dt)
 
